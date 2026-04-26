@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <xacro:include filename="pioneer3dx_laser.xacro" />
+  <xacro:include filename="pioneer3dx_camera.xacro" />
+  <xacro:include filename="pioneer3dx_imu.xacro" />
+
+  <xacro:macro name="pioneer3dx_sensors" params="parent models robot_namespace">
+
+    <!-- Laser (Sick LMS100 / Hokuyo) -->
+    <xacro:if value="$(arg lidar_enabled)">
+      <xacro:laser name="lidar_link" parent="${parent}" xyz="0.16 0 0.36" rpy="0 0 0"
+        meshes="file://$(find ${package_name})/models/laser/meshes" robot_namespace="${robot_namespace}"
+        gpu="true" />
+    </xacro:if>
+
+    <!-- Camera (RealSense D435) -->
+    <xacro:if value="$(arg camera_enabled)">
+      <xacro:cam name="front_camera" parent="${parent}" xyz="0 0 0.5" rpy="0 0 0"
+        meshes="file://$(find ${package_name})/models/camera/meshes"
+        robot_namespace="${robot_namespace}" />
+    </xacro:if>
+
+    <!-- IMU -->
+    <xacro:imu_sensor name="imu" parent="${parent}" xyz="0 0 0" rpy="0 0 0"
+      robot_namespace="${robot_namespace}" />
+
+  </xacro:macro>
+
+</robot>

@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <xacro:macro name="pioneer3dx_gz" params="robot_namespace:='' odometry_source:='encoders'">
+
+    <gazebo>
+      <plugin filename="gz-sim-diff-drive-system" name="gz::sim::systems::DiffDrive">
+        <left_joint>left_hub_joint</left_joint>
+        <right_joint>right_hub_joint</right_joint>
+        
+        <wheel_separation>0.31</wheel_separation>
+        <wheel_radius>0.10</wheel_radius>
+        
+        <max_linear_velocity>0.5</max_linear_velocity>    
+        <min_linear_velocity>-0.5</min_linear_velocity>   
+        <max_angular_velocity>1.5</max_angular_velocity>  
+        <min_angular_velocity>-1.5</min_angular_velocity> 
+        <max_wheel_torque>20</max_wheel_torque>           
+        <max_linear_acceleration>1</max_linear_acceleration>   
+        <max_angular_acceleration>2</max_angular_acceleration>  
+
+        <topic>model/pioneer3dx/cmd_vel</topic>
+        <odom_topic>model/pioneer3dx/odom</odom_topic>
+        <tf_topic>model/pioneer3dx/tf</tf_topic>
+        
+        <frame_id>odom</frame_id>
+        <child_frame_id>base_link</child_frame_id>
+        
+        <odom_publish_frequency>50</odom_publish_frequency>
+      </plugin>
+
+    </gazebo>
+
+    <gazebo>
+      <plugin filename="gz-sim-joint-state-publisher-system" 
+      name="gz::sim::systems::JointStatePublisher">
+        <topic>model/pioneer3dx/joint_states</topic>
+      </plugin>
+    </gazebo>
+
+
+    <xacro:if value="${odometry_source == 'world'}">
+      <gazebo>
+        <plugin filename="gz-sim-odometry-publisher-system"
+          name="gz::sim::systems::OdometryPublisher">
+          <odom_frame>odom</odom_frame>
+          <robot_base_frame>base_link</robot_base_frame>
+          <odom_publish_frequency>50</odom_publish_frequency>
+          <dimensions>2</dimensions>
+
+          <topic>model/pioneer3dx/odom</topic>
+          <tf_topic>model/pioneer3dx/tf</tf_topic>
+        </plugin>
+      </gazebo>
+    </xacro:if>
+
+  </xacro:macro>
+</robot>

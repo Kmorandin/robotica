@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+  <xacro:property name="M_PI" value="3.1415926535897931" />
+
+  <xacro:macro name="pioneer_sonar" params="name parent xyz rpy meshes">
+
+  <joint name="${parent}_${name}_joint" type="fixed">
+    <origin xyz="${xyz}" rpy="${rpy}"/>
+    <parent link="${parent}"/>
+    <child link="${name}"/>
+  </joint>
+
+  <link name="${name}">
+    <inertial>
+      <mass value="0.0001"/>
+      <origin xyz="0 0 0"/>
+      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+    </inertial>
+
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry name="pioneer_geom">
+        <mesh filename="${meshes}/back_sonar.stl"/>
+      </geometry>
+      <material name="sonar_yellow"/>
+    </visual>
+
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.01 0.01 0.01"/>
+      </geometry>
+    </collision>
+  </link>
+  <!-- SIMULATING WIDE SONAR AS A LOW-RES LASER SCAN -->
+  <gazebo reference="${name}">
+    <material value="Gazebo/Yellow"/>
+    <sensor name="${name}" type="gpu_lidar">
+      <update_rate>10.0</update_rate>
+      <always_on>1</always_on>
+      <visualize>true</visualize>
+      
+      <topic>model/pioneer3dx/sonar</topic>
+      <gz_frame_id>${name}</gz_frame_id>
+      
+      <ray>
+        <scan>
+          <horizontal>
+            <samples>8</samples>
+            <resolution>1</resolution>
+            <min_angle>-1.570796</min_angle>
+            <max_angle>1.570796</max_angle>
+          </horizontal>
+        </scan>
+        <range>
+          <min>0.1</min>
+          <max>5.0</max>
+          <resolution>0.017453292</resolution>
+        </range>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.01</stddev>
+        </noise>
+      </ray>
+    </sensor>
+  </gazebo>
+
+  </xacro:macro>
+
+</robot>

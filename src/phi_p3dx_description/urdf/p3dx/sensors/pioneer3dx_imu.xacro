@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <!-- IMU -->
+  <xacro:macro name="imu_sensor" params="name parent xyz rpy robot_namespace">
+
+    <joint name="${parent}_${name}_joint" type="fixed">
+      <axis xyz="0 0 1" />
+      <origin xyz="${xyz}" rpy="${rpy}" />
+      <parent link="${parent}" />
+      <child link="${name}" />
+    </joint>
+
+    <!-- IMU -->
+    <link name="${name}">
+      <inertial>
+        <mass value="1e-5" />
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+      </inertial>
+    </link>
+
+    <gazebo reference="${name}">
+      <sensor type="imu" name="${name}">
+        <always_on>1</always_on>
+        <update_rate>100</update_rate>
+        <visualize>false</visualize>
+        <xacro:if value="${robot_namespace == '/'}">
+          <gz_frame_id>${name}</gz_frame_id>
+          <topic>model/pioneer3dx/imu/data</topic>
+        </xacro:if>
+        <xacro:unless value="${robot_namespace == '/'}">
+          <gz_frame_id>${robot_namespace}/${name}</gz_frame_id>
+          <topic>${robot_namespace}/imu/data</topic>
+        </xacro:unless>
+      </sensor>
+    </gazebo>
+
+    <plugin filename="gz-sim-imu-system"
+      name="gz::sim::systems::Imu">
+    </plugin>
+
+  </xacro:macro>
+</robot>
